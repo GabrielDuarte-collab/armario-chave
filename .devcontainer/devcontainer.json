@@ -1,0 +1,39 @@
+{
+  "name": "SENAI - UC2 Programação de Aplicativos (Python & Django)",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.11-bullseye",
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.languageServer": "Pylance",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "explicit"
+        },
+        "files.autoSave": "afterDelay",
+        "files.autoSaveDelay": 1000
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "batisteo.vscode-django",
+        "eamodio.gitlens",
+        "mhutchie.git-graph",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": {
+      "label": "Django Dev Server",
+      "onAutoForward": "notify"
+    }
+  },
+
+  "postCreateCommand": "pip install --upgrade pip && pip install django djangorestframework && if [ -f requirements.txt ]; then pip install -r requirements.txt; fi",
+
+  "remoteUser": "vscode"
+}
