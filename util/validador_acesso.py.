@@ -1,18 +1,21 @@
+
 docente_ativo = True
 hora_atual = 23
 nicho_ocupado = False
 
-
 if not docente_ativo:
+    print("Erro de acesso")
     rejeitar("Cadastro Inativo")
 
 elif hora_atual >= 23 or hora_atual < 5:
+    print("Acesso negado!")
+    bloquear_fechadura()
     rejeitar("Trava Noturna")
 
 elif nicho_ocupado:
     rejeitar("Chave Indisponível")
 
 else:
+    print("Acesso concedido")
     liberar_chave()
-
     
