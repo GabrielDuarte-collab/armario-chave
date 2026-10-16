@@ -1,21 +1,57 @@
+# Dicionário com os dados dos colaboradores
+colaboradores = {
+    "123": {
+        "nome_completo": "Gabriel",
+        "tipo_cargo": "Docente",
+        "ativo": True,
+        "admin": False,
+        "num_chaves_em_uso": 1
+    },
+    "1234": {
+        "nome_completo": "Ana",
+        "tipo_cargo": "Docente",
+        "ativo": True,
+        "admin": False,
+        "num_chaves_em_uso": 0
+    }
+}
 
-docente_ativo = True
-hora_atual = 23
-nicho_ocupado = False
 
-if not docente_ativo:
-    print("Erro de acesso")
-    rejeitar("Cadastro Inativo")
+# Verifica se o crachá é válido
+def validar_cracha(id_cracha: str) -> bool:
+    c = colaboradores.get(id_cracha)
 
-elif hora_atual >= 23 or hora_atual < 5:
-    print("Acesso negado!")
-    bloquear_fechadura()
-    rejeitar("Trava Noturna")
+    # Verifica se existe, está ativo e é docente
+    return (
+        c is not None
+        and c["ativo"]
+        and c["tipo_cargo"] == "Docente"
+    )
 
-elif nicho_ocupado:
-    rejeitar("Chave Indisponível")
 
-else:
-    print("Acesso concedido")
-    liberar_chave()
-    
+# Verifica se o colaborador pode retirar uma chave
+def validar_acesso(id_cracha: str, hora_atual: int) -> dict:
+
+    # Verifica se o crachá é válido
+    if not validar_cracha(id_cracha):
+        return {"autorizado": False}
+
+    # Bloqueia o acesso entre 23h e antes das 5h
+    if hora_atual >= 23 or hora_atual < 5:
+        return {"autorizado": False}
+
+    # Verifica se o colaborador já está usando uma chave
+    if colaboradores[id_cracha]["num_chaves_em_uso"] >= 1:
+        return {"autorizado": False}
+
+    # Se passar por todas as verificações, autoriza
+    return {"autorizado": True}
+
+
+# Mostra os nomes dos colaboradores
+print(colaboradores["123"]["nome_completo"])
+print(colaboradores["1234"]["nome_completo"])
+
+# Testa a autorização de cada colaborador às 14h
+print(validar_acesso("123", 14))
+print(validar_acesso("1234", 14))
