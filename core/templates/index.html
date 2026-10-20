@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SENAI — Armário Inteligente de Chaves</title>
+    <title>{{Titulo}}-{nome}</title>
+
+    <!-- Fonte Google Inter -->
+    <link rel="preconnect" href="[suspicious link removed]" />
+    <link rel="preconnect" href="[suspicious link removed]" crossorigin />
+    <link href="[suspicious link removed]" rel="stylesheet" />
+
+    <style>
+      :root {
+        --senai-blue: #0056b3;
+        --senai-dark-blue: #003366;
+        --senai-orange: #f37021;
+        --bg-gray: #f4f6f9;
+        --card-bg: #ffffff;
+        --text-dark: #1c252c;
+        --text-muted: #6c757d;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Inter", sans-serif;
+      }
+
+      body {
+        background-color: var(--bg-gray);
+        color: var(--text-dark);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Topbar Institucional */
+      header {
+        background: linear-gradient(
+          135deg,
+          var(--senai-dark-blue),
+          var(--senai-blue)
+        );
+        color: white;
+        padding: 16px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 4px solid var(--senai-orange);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .logo-badge {
+        background-color: white;
+        color: var(--senai-dark-blue);
+        font-weight: 900;
+        font-size: 1.3rem;
+        padding: 4px 12px;
+        border-radius: 6px;
+        letter-spacing: 1px;
+      }
+
+      .logo-badge span {
+        color: var(--senai-orange);
+      }
+
+      /* Container Principal */
+      main {
+        flex: 1;
+        max-width: 900px;
+        width: 100%;
+        margin: 40px auto;
+        padding: 0 20px;
+      }
+
+      .hero-card {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        text-align: center;
+      }
+
+      .hero-card h1 {
+        font-size: 2rem;
+        color: var(--senai-dark-blue);
+        margin-bottom: 12px;
+      }
+
+      .hero-card p {
+        color: var(--text-muted);
+        font-size: 1.05rem;
+        margin-bottom: 32px;
+        line-height: 1.6;
+      }
+
+      /* Grade de Atalhos */
+      .grid-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+      }
+
+      .card-link {
+        background-color: var(--bg-gray);
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 20px;
+        text-decoration: none;
+        color: var(--text-dark);
+        transition: all 0.2s ease;
+        text-align: left;
+      }
+
+      .card-link:hover {
+        border-color: var(--senai-blue);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 86, 179, 0.1);
+      }
+
+      .card-link h3 {
+        font-size: 1.1rem;
+        color: var(--senai-blue);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .card-link p {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 0;
+      }
+
+      /* Status Badge */
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background-color: #e8f5e9;
+        color: #28a745;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 24px;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        background-color: #28a745;
+        border-radius: 50%;
+      }
+
+      /* Rodapé */
+      footer {
+        text-align: center;
+        padding: 20px;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        border-top: 1px solid #e2e8f0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- CABEÇALHO INSTITUCIONAL -->
+    <header>
+      <div class="logo-badge">SENAI<span>.</span></div>
+      <span style="font-size: 0.9rem; font-weight: 600"
+        >UC2 — Programação de Aplicativos</span
+      >
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main>
+      <div class="hero-card">
+        <div class="status-pill">
+          <span class="dot"></span> Servidor Django em Execução
+        </div>
+
+        <h1>Armário Inteligente de Chaves</h1>
+        <p>
+          Sistema web para controle de acesso, rastreabilidade e gestão
+          automatizada de chaves RFID/NFC do SENAI Aparecida de Goiânia.
+        </p>
+
+        <div class="grid-links">
+          <!-- Atalho Dashboard -->
+          <a href="/dashboard/" class="card-link">
+            <h3>📊 Painel Dashboard</h3>
+            <p>
+              Visualização em tempo real do estado dos nichos e ocupação das
+              salas.
+            </p>
+          </a>
+
+          <!-- Atalho Swagger / Documentação API -->
+          <a href="/api/docs" class="card-link">
+            <h3>⚡ Swagger API Docs</h3>
+            <p>
+              Documentação interativa das rotas HTTP do Django Ninja para
+              testes.
+            </p>
+          </a>
+
+          <!-- Atalho Status JSON -->
+          <a href="/api/status/" class="card-link">
+            <h3>🔍 API Health Check</h3>
+            <p>Endpoint HTTP de verificação do status e horário do servidor.</p>
+          </a>
+
+          <!-- Atalho Admin Django -->
+          <a href="/admin/" class="card-link">
+            <h3>⚙️ Painel Admin</h3>
+            <p>
+              Interface administrativa nativa do Django para gestão de modelos.
+            </p>
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer>
+      <p>
+        Desenvolvido no Curso Técnico em Desenvolvimento de Sistemas — SENAI
+        Aparecida de Goiânia
+      </p>
+    </footer>
+  </body>
+</html>
