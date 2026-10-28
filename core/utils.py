@@ -10,11 +10,10 @@ def dictfetchall(cursor):
     ]
 
 def buscar_status_nichos_banco():
-    """Consulta a View SQL vw_status_nichos hospedada no Supabase."""
-    query = "SELECT * FROM vw_status_nichos ORDER BY id_nicho ASC;"
-    
+    query = "SELECT * FROM vw_status_nicho ORDER BY nicho_id ASC;"
+
     with connection.cursor() as cursor:
         cursor.execute(query)
         dados = dictfetchall(cursor)
-        
+
     return dados
