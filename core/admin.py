@@ -1,3 +1,7 @@
 from django.contrib import admin
+from .models import Unidade, Usuario, Espaco, Chave
 
-# Register your models here.
+admin.site.register(Unidade)
+admin.site.register(Usuario)
+admin.site.register(Espaco)
+admin.site.register(Chave)
