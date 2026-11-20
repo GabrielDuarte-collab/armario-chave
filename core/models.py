@@ -1,5 +1,14 @@
+from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
+
+
+class PerfilAcesso(models.TextChoices):
+    MASTER_GERAL = 'MASTER_GERAL', 'Master Geral (Global)'
+    MASTER_UNIDADE = 'MASTER_UNIDADE', 'Master da Unidade'
+    COORDENADOR = 'COORDENADOR', 'Coordenador de Área'
+    DOCENTE = 'DOCENTE', 'Docente'
+    PORTARIA = 'PORTARIA', 'Operador de Portaria'
 
 
 class DiaSemana(models.IntegerChoices):
@@ -21,8 +30,7 @@ class Unidade(models.Model):
     """Representa cada escola do SENAI."""
 
     id_unidade = models.AutoField(primary_key=True)
-    cd_unidade = models.CharField(
-        max_length=20, unique=True)  # ex: 'SENAI-APAR'
+    cd_unidade = models.CharField(max_length=20, unique=True)  # ex: 'SENAI-APAR'
     nm_unidade = models.CharField(max_length=150)
     cidade = models.CharField(max_length=100, default="Aparecida de Goiânia")
 
@@ -35,22 +43,16 @@ class Unidade(models.Model):
         return f"{self.cd_unidade} - {self.nm_unidade}"
 
 
-class Usuario(models.Model):
+class Usuario(AbstractUser):
     """Docentes, coordenadores e administradores."""
 
-    class Perfil(models.TextChoices):
-        MASTER_GERAL = "MASTER_GERAL", "Master Geral"
-        MASTER_UNIDADE = "MASTER_UNIDADE", "Master da Unidade"
-        COORDENADOR = "COORDENADOR", "Coordenador"
-        DOCENTE = "DOCENTE", "Docente"
-        PORTARIA = "PORTARIA", "Portaria"
-
-    id_usuario = models.AutoField(primary_key=True)
-    nm_usuario = models.CharField(max_length=100)
+    perfil = models.CharField(
+        max_length=20,
+        choices=PerfilAcesso.choices,
+        default=PerfilAcesso.DOCENTE,
+    )
     uuid_cracha = models.CharField(max_length=50, unique=True, null=True, blank=True)
-    perfil = models.CharField(max_length=20, choices=Perfil.choices)
-    unidades = models.ManyToManyField(Unidade, related_name="usuarios")
-    st_ativo = models.BooleanField(default=True)
+    unidades = models.ManyToManyField(Unidade, related_name="usuarios", blank=True)
 
     class Meta:
         db_table = "usuario"
@@ -58,7 +60,7 @@ class Usuario(models.Model):
         verbose_name_plural = "Usuários"
 
     def __str__(self):
-        return f"{self.nm_usuario} ({self.perfil})"
+        return f"{self.get_full_name() or self.username} ({self.perfil})"
 
 
 class Espaco(models.Model):
@@ -122,8 +124,7 @@ class ReservaFixa(models.Model):
 
     def clean(self):
         if self.hr_inicio and self.hr_fim and self.hr_fim <= self.hr_inicio:
-            raise ValidationError(
-                "A hora de fim deve ser posterior à hora de início.")
+            raise ValidationError("A hora de fim deve ser posterior à hora de início.")
 
     def __str__(self):
         return f"{self.ds_turma} | {self.get_nr_dia_semana_display()} {self.hr_inicio:%H:%M}"
@@ -162,8 +163,7 @@ class ReservaPontual(models.Model):
 
     def clean(self):
         if self.hr_inicio and self.hr_fim and self.hr_fim <= self.hr_inicio:
-            raise ValidationError(
-                "A hora de fim deve ser posterior à hora de início.")
+            raise ValidationError("A hora de fim deve ser posterior à hora de início.")
 
     def __str__(self):
         return f"{self.get_tp_reserva_display()} | {self.espaco.ds_espaco} | {self.dt_reserva} {self.hr_inicio:%H:%M}"
@@ -179,8 +179,7 @@ class Remanejamento(models.Model):
         Usuario, on_delete=models.PROTECT,
         related_name="remanejamentos_recebidos", verbose_name="Usuário Substituto",
     )
-    dt_remanejamento = models.DateField(
-        verbose_name="Data Específica da Alteração")
+    dt_remanejamento = models.DateField(verbose_name="Data Específica da Alteração")
     hr_inicio = models.TimeField(verbose_name="Hora de Início")
     hr_fim = models.TimeField(verbose_name="Hora de Fim")
     tp_reserva = models.CharField(
@@ -188,8 +187,7 @@ class Remanejamento(models.Model):
         default=TipoReservaPontual.DOCENTE_PONTUAL, verbose_name="Tipo de Reserva",
     )
     ds_motivo = models.TextField(verbose_name="Motivo do Remanejamento")
-    dh_registro = models.DateTimeField(
-        auto_now_add=True, verbose_name="Data/Hora do Registro")
+    dh_registro = models.DateTimeField(auto_now_add=True, verbose_name="Data/Hora do Registro")
 
     class Meta:
         db_table = "tb_remanejamento"
@@ -205,8 +203,8 @@ class Remanejamento(models.Model):
 
     def clean(self):
         if self.hr_inicio and self.hr_fim and self.hr_fim <= self.hr_inicio:
-            raise ValidationError(
-                "A hora de fim deve ser posterior à hora de início.")
+            raise ValidationError("A hora de fim deve ser posterior à hora de início.")
 
     def __str__(self):
-        return f"Remanejamento {self.dt_remanejamento} | {self.espaco.ds_espaco} -> {self.usuario_substituto.nm_usuario}"
+        nome = self.usuario_substituto.get_full_name() or self.usuario_substituto.username
+        return f"Remanejamento {self.dt_remanejamento} | {self.espaco.ds_espaco} -> {nome}"
