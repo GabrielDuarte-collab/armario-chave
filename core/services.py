@@ -1,44 +1,79 @@
+import datetime
+from datetime import date
+from typing import Optional, Tuple
 from django.utils import timezone
-from .models import ReservaFixa, ReservaPontual, Remanejamento
+from .models import Espaco, Usuario, Remanejamento, ReservaPontual, ReservaFixa
 
 
-def quem_ganha_a_chave(espaco, momento=None):
-    """Retorna (usuario, origem) ou (None, None) se o espaço estiver livre."""
-    momento = timezone.localtime(momento or timezone.now())
-    hoje, agora = momento.date(), momento.time()
+class ValidadorReservaService:
 
+    @classmethod
+    def validar_direito_retirada(
+        cls,
+        espaco: Espaco,
+        usuario: Usuario,
+        dt_referencia: date = None,
+        hr_referencia: datetime.time = None,
+    ) -> Tuple[bool, str]:
+        agora = timezone.localtime()
+        dt_referencia = dt_referencia or agora.date()
+        hr_referencia = hr_referencia or agora.time().replace(microsecond=0)
 
-    rem = Remanejamento.objects.filter(
-        espaco=espaco, dt_remanejamento=hoje,
-        hr_inicio__lte=agora, hr_fim__gt=agora,
-    ).select_related("usuario_substituto").first()
-    if rem:
-        return rem.usuario_substituto, "REMANEJAMENTO"
+        titular, origem = cls._quem_ganha_a_chave(espaco, dt_referencia, hr_referencia)
 
-    pontual = ReservaPontual.objects.filter(
-        espaco=espaco, dt_reserva=hoje, st_aprovado=True,
-        hr_inicio__lte=agora, hr_fim__gt=agora,
-    ).select_related("usuario").first()
-    if pontual:
-        return pontual.usuario, pontual.tp_reserva
+        if titular is None:
+            return True, "Retirada autorizada: espaço livre no período."
 
-    
-    fixa = ReservaFixa.objects.filter(
-        espaco=espaco, nr_dia_semana=hoje.weekday(),
-        hr_inicio__lte=agora, hr_fim__gt=agora,
-    ).select_related("usuario").first()
-    if fixa:
-        return fixa.usuario, "FIXA"
+        if titular.pk == usuario.pk:
+            return True, f"Retirada autorizada: direito do usuário por {origem}."
 
-    
-    return None, None
-
-    class validadorRersevaService:
-        @classmethod 
-        def validar_direito_retirada(
-            cls,
-            espacp: Espaco,
-            usuario: Usuario,
-            dt_referencia: date = Nome,
-            hr_referencia: datetime.time = NotImplemented
+        return False, (
+            f"Retirada negada: o espaço está alocado a outro usuário "
+            f"({titular}) por {origem}."
         )
+
+    @classmethod
+    def _quem_ganha_a_chave(
+        cls, espaco: Espaco, dt: date, hr: datetime.time
+    ) -> Tuple[Optional[Usuario], Optional[str]]:
+        rem = (
+            Remanejamento.objects.filter(
+                espaco=espaco,
+                dt_remanejamento=dt,
+                hr_inicio__lte=hr,
+                hr_fim__gt=hr,
+            )
+            .select_related("usuario_substituto")
+            .first()
+        )
+        if rem:
+            return rem.usuario_substituto, "REMANEJAMENTO"
+
+        pontual = (
+            ReservaPontual.objects.filter(
+                espaco=espaco,
+                dt_reserva=dt,
+                st_aprovado=True,
+                hr_inicio__lte=hr,
+                hr_fim__gt=hr,
+            )
+            .select_related("usuario")
+            .first()
+        )
+        if pontual:
+            return pontual.usuario, pontual.tp_reserva
+
+        fixa = (
+            ReservaFixa.objects.filter(
+                espaco=espaco,
+                nr_dia_semana=dt.weekday(),
+                hr_inicio__lte=hr,
+                hr_fim__gt=hr,
+            )
+            .select_related("usuario")
+            .first()
+        )
+        if fixa:
+            return fixa.usuario, "FIXA"
+
+        return None, None
